@@ -1,5 +1,3 @@
-import UIKit
-
 enum Log: String{
     case d = "debug  "
     case e = "error  "
