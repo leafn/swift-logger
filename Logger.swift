@@ -1,3 +1,12 @@
+import UIKit
+
+func log(_ type: Log, _ message: String, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+    #if DEBUG
+        type.s(message, file, function, line)
+    #else
+    #endif
+}
+
 enum Log: String{
     case d = "debug  "
     case e = "error  "
@@ -41,13 +50,27 @@ enum Log: String{
         }()
         
         print("[\(dateFormatter.string(from:Date()))] \(self.emoji) \(self.rawValue)| \(string)")
-    }
-    
-    func p_option() {
         
+        //NSLog(string)
     }
     
-    func p_adv() {
-        // 만드는 중...
+    func s(_ string: String, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+        
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+            return formatter
+        }()
+        
+        var fileString: String
+        let components = file.components(separatedBy: "/")
+        if components.count > 0 {
+            fileString = components.last!
+        } else {
+            fileString = file
+        }
+        
+        print("[\(dateFormatter.string(from:Date()))] \(self.emoji) \(self.rawValue)| \(fileString) > \(function): \(line)")
+        print(string)
     }
 }
