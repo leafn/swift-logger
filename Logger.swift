@@ -14,6 +14,22 @@ func logger<T>(_ type: Logger, _ target: T, _ file: String = #file, _ function: 
     }
 }
 
+func logger_format(_ type: Logger, format: String, arguments: [CVarArg], _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+    switch type {
+    case .d:
+        #if DEBUG
+            let target = String(format: format, arguments: arguments)
+            type.s(target, file, function, line)
+        #else
+        #endif
+        break
+    default:
+        let target = String(format: format, arguments: arguments)
+        type.s(target, file, function, line)
+        break
+    }
+}
+
 struct LogStream: TextOutputStream {
     let stdout = FileHandle.standardOutput
     let stderr = FileHandle.standardError
