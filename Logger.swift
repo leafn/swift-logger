@@ -1,13 +1,33 @@
 import UIKit
 
-func log(_ type: Log, _ message: String, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
-    #if DEBUG
-        type.s(message, file, function, line)
-    #else
-    #endif
+func logger<T>(_ type: Logger, _ target: T, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+    switch type {
+    case .d:
+        #if DEBUG
+            type.s("\(target)", file, function, line)
+        #else
+        #endif
+        break
+    default:
+        type.s("\(target)", file, function, line)
+        break
+    }
 }
 
-enum Log: String{
+struct LogStream: TextOutputStream {
+    let stdout = FileHandle.standardOutput
+    let stderr = FileHandle.standardError
+    
+    mutating func write(_ string: String) {
+        guard let data = string.data(using: .utf8) else {
+            return
+        }
+        
+        stdout.write(data)
+    }
+}
+
+enum Logger: String{
     case d = "debug  "
     case e = "error  "
     case i = "info   "
@@ -50,11 +70,11 @@ enum Log: String{
         }()
         
         print("[\(dateFormatter.string(from:Date()))] \(self.emoji) \(self.rawValue)| \(string)")
-        
-        //NSLog(string)
     }
     
-    func s(_ string: String, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+    func s(_ target: String, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
+        
+        var stream = LogStream()
         
         let dateFormatter: DateFormatter = {
             let formatter = DateFormatter()
@@ -70,7 +90,7 @@ enum Log: String{
             fileString = file
         }
         
-        print("[\(dateFormatter.string(from:Date()))] \(self.emoji) \(self.rawValue)| \(fileString) > \(function): \(line)")
-        print(string)
+        print("[\(dateFormatter.string(from:Date()))] \(self.emoji) \(self.rawValue)| \(fileString) > \(function): \(line)", to: &stream)
+        print(target, to: &stream)
     }
 }
